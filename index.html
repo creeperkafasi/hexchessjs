@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hex Chess</title>
+</head>
+
+<body>
+    <h1>Hexagonal Chess</h1>
+    <canvas width="500" height="500" id="board"></canvas>
+    <script src="game.js"></script>
+    <br>
+    <br>
+    Built by: <a href="https://deniz.is-a.dev">Deniz Tunç</a>
+    <br>
+    Inspired by: <a href="https://www.youtube.com/watch?v=bgR3yESAEVE">CGP Grey</a>
+    <br>
+    Image Credits:
+    <a href="https://commons.wikimedia.org/wiki/File:Chess_kdt45.svg">Cburnett</a>, <a
+        href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>, via Wikimedia Commons
+    <div id="pieces" onload="console.log('loaded')">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f0/Chess_kdt45.svg" id="kd">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/47/Chess_qdt45.svg" id="qd">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Chess_rdt45.svg" id="rd">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/9/98/Chess_bdt45.svg" id="bd">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/e/ef/Chess_ndt45.svg" id="nd">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c7/Chess_pdt45.svg" id="pd">
+        <br>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/42/Chess_klt45.svg" id="kl">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/Chess_qlt45.svg" id="ql">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Chess_rlt45.svg" id="rl">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Chess_blt45.svg" id="bl">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/7/70/Chess_nlt45.svg" id="nl">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/45/Chess_plt45.svg" id="pl">
+    </div>
+</body>
+
+<style>
+    body {
+        background-color: lightsteelblue;
+        text-align: center;
+    }
+
+    canvas {
+        margin: auto;
+        background-color: white;
+    }
+</style>
+
+</html>
