@@ -1,7 +1,7 @@
 // fix js % operator
-Number.prototype.mod = function (n) {
+function mod(a, b) {
     "use strict";
-    return ((this % n) + n) % n;
+    return ((a % b) + b) % b;
 };
 
 const R2 = Math.SQRT2;
@@ -26,8 +26,8 @@ const Moves = {
     ]
 }
 
-// 0 = black
-// 1 = white
+// d = dark
+// l = light
 // p = pawn
 // r = rook
 // b = bishop
@@ -80,6 +80,27 @@ var Map = {
     "1,9": "kl",
 }
 
+pawnInits = {
+    d: [
+        "-3,-7",
+        "-2,-6",
+        "-1,-5",
+        "0,-4",
+        "1,-5",
+        "2,-6",
+        "3,-7",
+    ],
+    l: [
+        "-3,7",
+        "-2,6",
+        "-1,5",
+        "0,4",
+        "1,5",
+        "2,6",
+        "3,7",
+    ]
+}
+
 
 /**
  * @type {HTMLCanvasElement}
@@ -88,23 +109,44 @@ const canvas = document.getElementById("board");
 const ctx = canvas.getContext("2d");
 
 
+let selectedPiece = "";
+
+const r = 22.5;
+
 setInterval(() => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const r = 22.5;
-
-    const start = [250, 250];
+    const start = [canvas.width / 2, canvas.height / 2];
     ctx.strokeStyle = "black";
     for (let col = 0; col < 11; col++) {
         const rowAmount = 11 - Math.abs(col - 5);
         for (let row = 0; row < rowAmount; row++) {
             x = col - 5;
             y = 2 * row - rowAmount + 1;
+
+            // Draw tile
+            ctx.strokeStyle = "black";
             ctx.beginPath();
             ctx.ellipse(
                 start[0] + x * R3 * r,
                 start[1] + y * r,
                 r, r, 0, 0, 360);
+            ctx.stroke();
+            ctx.closePath();
+
+
+            if (selectedPiece == `${x},${y}`) {
+                ctx.fillStyle = "#5555ff44"
+                ctx.beginPath();
+                ctx.ellipse(
+                    start[0] + x * R3 * r,
+                    start[1] + y * r,
+                    r, r, 0, 0, 360);
+                ctx.fill();
+                ctx.closePath();
+            }
+
+            // Draw piece
             if (Map[`${x},${y}`]) {
                 ctx.drawImage(
                     document.getElementById(Map[`${x},${y}`]),
@@ -112,16 +154,38 @@ setInterval(() => {
                     start[1] + y * r - 22.5,
                 );
             }
-            // ctx.strokeText(
-            //     `${Map[`${x},${y}`] ?? ""}`
-            //     // + `(${x},${y})`
-            //     ,
-            //     start[0] + x * R3 * r - r / 2,
-            //     start[1] + y * r + r / 2,
-            // );
 
+            // Draw debug info
+            ctx.beginPath();
+            ctx.strokeStyle = "blue";
+            ctx.strokeText(""
+                // + `${Map[`${x},${y}`] ?? ""}`
+                + `(${x},${y})`
+                ,
+                start[0] + x * R3 * r - r / 2,
+                start[1] + y * r + r / 2,
+            );
             ctx.closePath();
             ctx.stroke();
         }
     }
 }, 1000 / 60);
+
+// Magic collision detection made via trial and error
+canvas.addEventListener("click", (ev) => {
+    const ex = ev.offsetX - 250;
+    let ey = ev.offsetY - 250;
+    ey = ey - r + mod(x, 2) * r;
+
+
+    x = Math.round(ex / r / R3);
+    if (mod(x, 2) == 0) {
+        y = Math.round(ey / r / 2) * 2;
+    }
+    else {
+        ey -= mod(ey, 2 * r);
+        y = ey / (r);
+        y = y - (y % 2) + 1;
+    }
+    selectedPiece = `${x},${y}`;
+});
