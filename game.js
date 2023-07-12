@@ -160,8 +160,16 @@ setInterval(() => {
                             if (pawnInits[piece[1]].includes(selectedPiece)) {
                                 moves.push((piece[1] == 'd' ? [x, y + 4] : [x + 0, y - 4]))
                             }
-                            // TODO: Diagonal attack moves
-                            getAvailableLine(moves, false).concat().forEach((move) => {
+                            moves = getAvailableLine(moves);
+
+                            moves = moves.concat(
+                                (piece[1] == 'd' ?
+                                    [[x + 1, y + 1], [x - 1, y + 1]] :
+                                    [[x + 1, y - 1], [x - 1, y - 1]]
+                                ).filter((c) => !checkAvailable(...c) && !checkSameColor(c[0], c[1], x, y))
+                            );
+                            
+                            moves.forEach((move) => {
                                 ctx.fillStyle = "#55ff5544"
                                 ctx.beginPath();
                                 ctx.ellipse(
