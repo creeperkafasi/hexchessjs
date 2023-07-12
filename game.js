@@ -168,7 +168,7 @@ setInterval(() => {
                                     [[x + 1, y - 1], [x - 1, y - 1]]
                                 ).filter((c) => !checkAvailable(...c) && !checkSameColor(c[0], c[1], x, y))
                             );
-                            
+
                             moves.forEach((move) => {
                                 ctx.fillStyle = "#55ff5544"
                                 ctx.beginPath();
@@ -250,17 +250,17 @@ setInterval(() => {
             }
 
             // Draw debug info
-            ctx.beginPath();
-            ctx.strokeStyle = "blue";
-            ctx.strokeText(""
-                // + `${Table[`${x},${y}`] ?? ""}`
-                + `(${x},${y})`
-                ,
-                start[0] + x * R3 * r - r / 2,
-                start[1] + y * r + r / 2,
-            );
-            ctx.closePath();
-            ctx.stroke();
+            // ctx.beginPath();
+            // ctx.strokeStyle = "blue";
+            // ctx.strokeText(""
+            //     // + `${Table[`${x},${y}`] ?? ""}`
+            //     + `(${x},${y})`
+            //     ,
+            //     start[0] + x * R3 * r - r / 2,
+            //     start[1] + y * r + r / 2,
+            // );
+            // ctx.closePath();
+            // ctx.stroke();
         }
     }
 }, 1000 / 60);
