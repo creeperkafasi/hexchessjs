@@ -127,6 +127,7 @@ setInterval(() => {
             x = col - 5;
             y = 2 * row - rowAmount + 1;
 
+            // Initialize empty tiles with "e" so to not be confused with out of bounds tiles
             if (!Map[`${x},${y}`]) Map[`${x},${y}`] = "e";
 
             // Draw tile
@@ -169,7 +170,49 @@ setInterval(() => {
                                 ctx.closePath();
                             });
                             break;
+                        case 'b':
+                            // debugger;
+                            moves = Moves.diagonal.map(
+                                (d) => getAvailableLine(
+                                    // 6 is the longest distance you can travel diagonally
+                                    Array(6).fill(d).map(
+                                        (v, i) => [x + v[0] * (i + 1), y + v[1] * (i + 1)]
+                                    )
+                                )
+                            ).flat();
+                            getAvailableLine(moves).forEach((move) => {
+                                ctx.fillStyle = "#55ff5544"
+                                ctx.beginPath();
+                                ctx.ellipse(
+                                    start[0] + (move[0]) * R3 * r,
+                                    start[1] + (move[1]) * r,
+                                    r, r, 0, 0, 360);
+                                ctx.fill();
+                                ctx.closePath();
+                            });
+                            break;
 
+                        case 'r':
+                            // debugger;
+                            moves = Moves.straight.map(
+                                (d) => getAvailableLine(
+                                    // 11 is the longest distance you can travel straight
+                                    Array(11).fill(d).map(
+                                        (v, i) => [x + v[0] * (i + 1), y + v[1] * (i + 1)]
+                                    )
+                                )
+                            ).flat();
+                            getAvailableLine(moves).forEach((move) => {
+                                ctx.fillStyle = "#55ff5544"
+                                ctx.beginPath();
+                                ctx.ellipse(
+                                    start[0] + (move[0]) * R3 * r,
+                                    start[1] + (move[1]) * r,
+                                    r, r, 0, 0, 360);
+                                ctx.fill();
+                                ctx.closePath();
+                            });
+                            break;
                         default:
                             break;
                     }
