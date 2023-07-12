@@ -9,12 +9,12 @@ const R3 = Math.sqrt(3);
 
 const Moves = {
     straight: [
-        [0, 2],
-        [-1, 1],
-        [-1, -1],
         [0, -2],
         [1, -1],
         [1, 1],
+        [0, 2],
+        [-1, 1],
+        [-1, -1],
     ],
     diagonal: [
         [2, 0],
@@ -35,7 +35,7 @@ const Moves = {
 // n = knight
 // q = queen
 // k = king
-var Map = {
+var Table = {
     // Black Pieces
     "-3,-7": "pd",
     "-2,-6": "pd",
@@ -80,8 +80,8 @@ var Map = {
     "-1,9": "ql",
     "1,9": "kl",
 }
-// var Map = {
-//     "1,-9": "pl"
+// var Table = {
+//     "0,0": "kl"
 // }
 const pawnInits = {
     d: [
@@ -128,7 +128,7 @@ setInterval(() => {
             y = 2 * row - rowAmount + 1;
 
             // Initialize empty tiles with "e" so to not be confused with out of bounds tiles
-            if (!Map[`${x},${y}`]) Map[`${x},${y}`] = "e";
+            if (!Table[`${x},${y}`]) Table[`${x},${y}`] = "e";
 
             // Draw tile
             ctx.strokeStyle = "black";
@@ -151,7 +151,7 @@ setInterval(() => {
                 ctx.fill();
                 ctx.closePath();
 
-                let piece = Map[selectedPiece];
+                let piece = Table[selectedPiece];
                 if (piece) {
                     switch (piece[0]) {
                         case 'p':
@@ -159,7 +159,8 @@ setInterval(() => {
                             if (pawnInits[piece[1]].includes(selectedPiece)) {
                                 moves.push((piece[1] == 'd' ? [x, y + 4] : [x + 0, y - 4]))
                             }
-                            getAvailableLine(moves).forEach((move) => {
+                            // TODO: Diagonal attack moves
+                            getAvailableLine(moves, false).concat().forEach((move) => {
                                 ctx.fillStyle = "#55ff5544"
                                 ctx.beginPath();
                                 ctx.ellipse(
@@ -171,7 +172,6 @@ setInterval(() => {
                             });
                             break;
                         case 'b':
-                            // debugger;
                             moves = Moves.diagonal.map(
                                 (d) => getAvailableLine(
                                     // 6 is the longest distance you can travel diagonally
@@ -180,20 +180,9 @@ setInterval(() => {
                                     )
                                 )
                             ).flat();
-                            getAvailableLine(moves).forEach((move) => {
-                                ctx.fillStyle = "#55ff5544"
-                                ctx.beginPath();
-                                ctx.ellipse(
-                                    start[0] + (move[0]) * R3 * r,
-                                    start[1] + (move[1]) * r,
-                                    r, r, 0, 0, 360);
-                                ctx.fill();
-                                ctx.closePath();
-                            });
                             break;
 
                         case 'r':
-                            // debugger;
                             moves = Moves.straight.map(
                                 (d) => getAvailableLine(
                                     // 11 is the longest distance you can travel straight
@@ -202,27 +191,43 @@ setInterval(() => {
                                     )
                                 )
                             ).flat();
-                            getAvailableLine(moves).forEach((move) => {
-                                ctx.fillStyle = "#55ff5544"
-                                ctx.beginPath();
-                                ctx.ellipse(
-                                    start[0] + (move[0]) * R3 * r,
-                                    start[1] + (move[1]) * r,
-                                    r, r, 0, 0, 360);
-                                ctx.fill();
-                                ctx.closePath();
-                            });
+                            break;
+                        case 'q':
+                            moves = Moves.straight.concat(Moves.diagonal).map(
+                                (d) => getAvailableLine(
+                                    // 11 > 6 \_(シ)_/
+                                    Array(11).fill(d).map(
+                                        (v, i) => [x + v[0] * (i + 1), y + v[1] * (i + 1)]
+                                    )
+                                )
+                            ).flat()
+                            break;
+                        case 'k':
+                            moves = Moves.straight.concat(Moves.diagonal).map(
+                                (d) => getAvailableLine([[x + d[0], y + d[1]]])
+                            ).flat()
                             break;
                         default:
                             break;
                     }
+
+                    moves.forEach((move) => {
+                        ctx.fillStyle = "#55ff5544"
+                        ctx.beginPath();
+                        ctx.ellipse(
+                            start[0] + (move[0]) * R3 * r,
+                            start[1] + (move[1]) * r,
+                            r, r, 0, 0, 360);
+                        ctx.fill();
+                        ctx.closePath();
+                    });
                 }
             }
 
             // Draw piece
             if (!checkAvailable(x, y)) {
                 ctx.drawImage(
-                    document.getElementById(Map[`${x},${y}`]),
+                    document.getElementById(Table[`${x},${y}`]),
                     start[0] + x * R3 * r - 22.5,
                     start[1] + y * r - 22.5,
                 );
@@ -232,7 +237,7 @@ setInterval(() => {
             ctx.beginPath();
             ctx.strokeStyle = "blue";
             ctx.strokeText(""
-                // + `${Map[`${x},${y}`] ?? ""}`
+                // + `${Table[`${x},${y}`] ?? ""}`
                 + `(${x},${y})`
                 ,
                 start[0] + x * R3 * r - r / 2,
@@ -260,14 +265,18 @@ canvas.addEventListener("click", (ev) => {
         y = ey / (r);
         y = y - (y % 2) + 1;
     }
-    if (moves.find((e) => (e[0] == x && e[1] == y) && checkAvailable(e[0], e[1]))) {
+    if (moves.find((e) => (e[0] == x && e[1] == y))) {
+        if (!checkAvailable(Table[`${x},${y}`]) && Table[`${x},${y}`][0] == "k") {
+            return;
+        }
         const selectedCoord = selectedPiece.split(",").map(e => Number.parseInt(e));
-        Map[`${x},${y}`] = copy(Map[`${selectedCoord[0]},${selectedCoord[1]}`]);
-        Map[`${selectedCoord[0]},${selectedCoord[1]}`] = "e";
+        Table[`${x},${y}`] = copy(Table[`${selectedCoord[0]},${selectedCoord[1]}`]);
+        Table[`${selectedCoord[0]},${selectedCoord[1]}`] = "e";
         selectedPiece = "";
         moves = [];
         return;
     }
+    moves = [];
     selectedPiece = `${x},${y}`;
 });
 
@@ -276,21 +285,45 @@ function copy(obj) {
 }
 
 function checkAvailable(x, y) {
-    return Map[`${x},${y}`] == "e";
+    return Table[`${x},${y}`] == "e";
+}
+
+function checkOutOfBounds(x, y) {
+    return Table[`${x},${y}`] == undefined;
+}
+
+function checkSameColor(x1, y1, x2, y2) {
+    if (!Table[`${x},${y}`]) return true;
+    if (checkAvailable(x1, y1) || checkAvailable(x2, y2)) return false;
+    return Table[`${x1},${y1}`][1] == Table[`${x2},${y2}`][1];
 }
 
 /**
  * @param {Number[][]} coords
+ * @param {boolean} canEatNext
  * @returns {Number[][]}
  */
-function getAvailableLine(coords) {
+function getAvailableLine(coords, canEatNext = true) {
     let ret = [];
+    let hasEaten = false;
+    const selectedCoord = selectedPiece.split(",").map((n) => Number.parseInt(n));
     coords.every(([x, y]) => {
+        if (hasEaten) {
+            return false;
+        }
+        if (checkOutOfBounds(x, y)) {
+            return false;
+        }
         if (checkAvailable(x, y)) {
             ret.push([x, y])
             return true;
         }
-        return false;
+        else if (canEatNext && !hasEaten && !checkSameColor(x, y, selectedCoord[0], selectedCoord[1])) {
+            ret.push([x, y]);
+            hasEaten = true;
+            return true;
+        }
+        return false
     });
     return ret;
 }
