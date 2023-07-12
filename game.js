@@ -80,8 +80,9 @@ var Table = {
     "-1,9": "ql",
     "1,9": "kl",
 }
+// Test board
 // var Table = {
-//     "0,0": "kl"
+//     "0,0": "nl"
 // }
 const pawnInits = {
     d: [
@@ -207,6 +208,13 @@ setInterval(() => {
                                 (d) => getAvailableLine([[x + d[0], y + d[1]]])
                             ).flat()
                             break;
+                        case 'n':
+                            moves = Moves.straight.map((a, i) => [
+                                [x + a[0] * 2 + str60deg(i)[0][0], y + a[1] * 2 + str60deg(i)[0][1]],
+                                [x + a[0] * 2 + str60deg(i)[1][0], y + a[1] * 2 + str60deg(i)[1][1]]
+                            ]).flat().filter((v) => getAvailableLine([v]).length > 0);
+                            break;
+
                         default:
                             break;
                     }
@@ -282,6 +290,17 @@ canvas.addEventListener("click", (ev) => {
 
 function copy(obj) {
     return JSON.parse(JSON.stringify(obj));
+}
+
+/**
+ * @param {int} i 
+ * @returns {number[][]} Straight axes that make a 60deg angle with `Moves.straight[i]`
+ */
+function str60deg(i) {
+    return [
+        Moves.straight[(i + 5) % 6],
+        Moves.straight[(i + 1) % 6]
+    ]
 }
 
 function checkAvailable(x, y) {
