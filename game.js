@@ -23,7 +23,8 @@ const Moves = {
         [-2, 0],
         [-1, -3],
         [1, -3],
-    ]
+    ],
+
 }
 
 // d = dark
@@ -79,8 +80,10 @@ var Map = {
     "-1,9": "ql",
     "1,9": "kl",
 }
-
-pawnInits = {
+// var Map = {
+//     "1,-9": "pl"
+// }
+const pawnInits = {
     d: [
         "-3,-7",
         "-2,-6",
@@ -101,7 +104,6 @@ pawnInits = {
     ]
 }
 
-
 /**
  * @type {HTMLCanvasElement}
  */
@@ -110,6 +112,7 @@ const ctx = canvas.getContext("2d");
 
 
 let selectedPiece = "";
+let moves = [];
 
 const r = 22.5;
 
@@ -123,6 +126,8 @@ setInterval(() => {
         for (let row = 0; row < rowAmount; row++) {
             x = col - 5;
             y = 2 * row - rowAmount + 1;
+
+            if (!Map[`${x},${y}`]) Map[`${x},${y}`] = "e";
 
             // Draw tile
             ctx.strokeStyle = "black";
@@ -144,10 +149,35 @@ setInterval(() => {
                     r, r, 0, 0, 360);
                 ctx.fill();
                 ctx.closePath();
+
+                let piece = Map[selectedPiece];
+                if (piece) {
+                    switch (piece[0]) {
+                        case 'p':
+                            moves = [(piece[1] == 'd' ? [x, y + 2] : [x + 0, y - 2])];
+                            if (pawnInits[piece[1]].includes(selectedPiece)) {
+                                moves.push((piece[1] == 'd' ? [x, y + 4] : [x + 0, y - 4]))
+                            }
+                            getAvailableLine(moves).forEach((move) => {
+                                ctx.fillStyle = "#55ff5544"
+                                ctx.beginPath();
+                                ctx.ellipse(
+                                    start[0] + (move[0]) * R3 * r,
+                                    start[1] + (move[1]) * r,
+                                    r, r, 0, 0, 360);
+                                ctx.fill();
+                                ctx.closePath();
+                            });
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
             }
 
             // Draw piece
-            if (Map[`${x},${y}`]) {
+            if (!checkAvailable(x, y)) {
                 ctx.drawImage(
                     document.getElementById(Map[`${x},${y}`]),
                     start[0] + x * R3 * r - 22.5,
@@ -187,5 +217,37 @@ canvas.addEventListener("click", (ev) => {
         y = ey / (r);
         y = y - (y % 2) + 1;
     }
+    if (moves.find((e) => (e[0] == x && e[1] == y) && checkAvailable(e[0], e[1]))) {
+        const selectedCoord = selectedPiece.split(",").map(e => Number.parseInt(e));
+        Map[`${x},${y}`] = copy(Map[`${selectedCoord[0]},${selectedCoord[1]}`]);
+        Map[`${selectedCoord[0]},${selectedCoord[1]}`] = "e";
+        selectedPiece = "";
+        moves = [];
+        return;
+    }
     selectedPiece = `${x},${y}`;
 });
+
+function copy(obj) {
+    return JSON.parse(JSON.stringify(obj));
+}
+
+function checkAvailable(x, y) {
+    return Map[`${x},${y}`] == "e";
+}
+
+/**
+ * @param {Number[][]} coords
+ * @returns {Number[][]}
+ */
+function getAvailableLine(coords) {
+    let ret = [];
+    coords.every(([x, y]) => {
+        if (checkAvailable(x, y)) {
+            ret.push([x, y])
+            return true;
+        }
+        return false;
+    });
+    return ret;
+}
