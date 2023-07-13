@@ -250,17 +250,17 @@ setInterval(() => {
             }
 
             // Draw debug info
-            ctx.beginPath();
-            ctx.strokeStyle = "blue";
-            ctx.strokeText(""
-                // + `${Table[`${x},${y}`] ?? ""}`
-                + `(${x},${y})`
-                ,
-                start[0] + x * R3 * r - r / 2,
-                start[1] + y * r + r / 2,
-            );
-            ctx.closePath();
-            ctx.stroke();
+            // ctx.beginPath();
+            // ctx.strokeStyle = "blue";
+            // ctx.strokeText(""
+            //     // + `${Table[`${x},${y}`] ?? ""}`
+            //     + `(${x},${y})`
+            //     ,
+            //     start[0] + x * R3 * r - r / 2,
+            //     start[1] + y * r + r / 2,
+            // );
+            // ctx.closePath();
+            // ctx.stroke();
         }
     }
 }, 1000 / 60);
