@@ -160,7 +160,7 @@ setInterval(() => {
                             if (pawnInits[piece[1]].includes(selectedPiece)) {
                                 moves.push((piece[1] == 'd' ? [x, y + 4] : [x + 0, y - 4]))
                             }
-                            moves = getAvailableLine(moves);
+                            moves = getAvailableLine(moves, false);
 
                             moves = moves.concat(
                                 (piece[1] == 'd' ?
