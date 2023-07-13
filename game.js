@@ -131,14 +131,17 @@ setInterval(() => {
             // Initialize empty tiles with "e" so to not be confused with out of bounds tiles
             if (!Table[`${x},${y}`]) Table[`${x},${y}`] = "e";
 
+            let tileColor = mod(y + 1, 3);
             // Draw tile
             ctx.strokeStyle = "black";
+            ctx.fillStyle = tileColor == 0 ? "#d18b47" : tileColor == 1 ? "#e8ab6f" : "#ffce9e";
             ctx.beginPath();
             ctx.ellipse(
                 start[0] + x * R3 * r,
                 start[1] + y * r,
                 r, r, 0, 0, 360);
-            ctx.stroke();
+            // ctx.stroke();
+            ctx.fill();
             ctx.closePath();
 
 
@@ -168,17 +171,6 @@ setInterval(() => {
                                     [[x + 1, y - 1], [x - 1, y - 1]]
                                 ).filter((c) => !checkAvailable(...c) && !checkSameColor(c[0], c[1], x, y))
                             );
-
-                            moves.forEach((move) => {
-                                ctx.fillStyle = "#55ff5544"
-                                ctx.beginPath();
-                                ctx.ellipse(
-                                    start[0] + (move[0]) * R3 * r,
-                                    start[1] + (move[1]) * r,
-                                    r, r, 0, 0, 360);
-                                ctx.fill();
-                                ctx.closePath();
-                            });
                             break;
                         case 'b':
                             moves = Moves.diagonal.map(
@@ -226,17 +218,6 @@ setInterval(() => {
                         default:
                             break;
                     }
-
-                    moves.forEach((move) => {
-                        ctx.fillStyle = "#55ff5544"
-                        ctx.beginPath();
-                        ctx.ellipse(
-                            start[0] + (move[0]) * R3 * r,
-                            start[1] + (move[1]) * r,
-                            r, r, 0, 0, 360);
-                        ctx.fill();
-                        ctx.closePath();
-                    });
                 }
             }
 
@@ -248,6 +229,17 @@ setInterval(() => {
                     start[1] + y * r - 22.5,
                 );
             }
+
+            moves.forEach((move) => {
+                ctx.fillStyle = "#55ff5511"
+                ctx.beginPath();
+                ctx.ellipse(
+                    start[0] + (move[0]) * R3 * r,
+                    start[1] + (move[1]) * r,
+                    r / 3, r / 3, 0, 0, 360);
+                ctx.fill();
+                ctx.closePath();
+            });
 
             // Draw debug info
             // ctx.beginPath();
