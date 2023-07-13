@@ -250,17 +250,17 @@ setInterval(() => {
             }
 
             // Draw debug info
-            // ctx.beginPath();
-            // ctx.strokeStyle = "blue";
-            // ctx.strokeText(""
-            //     // + `${Table[`${x},${y}`] ?? ""}`
-            //     + `(${x},${y})`
-            //     ,
-            //     start[0] + x * R3 * r - r / 2,
-            //     start[1] + y * r + r / 2,
-            // );
-            // ctx.closePath();
-            // ctx.stroke();
+            ctx.beginPath();
+            ctx.strokeStyle = "blue";
+            ctx.strokeText(""
+                // + `${Table[`${x},${y}`] ?? ""}`
+                + `(${x},${y})`
+                ,
+                start[0] + x * R3 * r - r / 2,
+                start[1] + y * r + r / 2,
+            );
+            ctx.closePath();
+            ctx.stroke();
         }
     }
 }, 1000 / 60);
@@ -282,12 +282,21 @@ canvas.addEventListener("click", (ev) => {
         y = y - (y % 2) + 1;
     }
     if (moves.find((e) => (e[0] == x && e[1] == y))) {
+        const selectedCoord = selectedPiece.split(",").map(e => Number.parseInt(e));
         if (!checkAvailable(Table[`${x},${y}`]) && Table[`${x},${y}`][0] == "k") {
             return;
         }
-        const selectedCoord = selectedPiece.split(",").map(e => Number.parseInt(e));
         Table[`${x},${y}`] = copy(Table[`${selectedCoord[0]},${selectedCoord[1]}`]);
         Table[`${selectedCoord[0]},${selectedCoord[1]}`] = "e";
+
+        if (Table[`${x},${y}`][0] == "p" && (Math.abs(x) + Math.abs(y) == 10)) {
+            const promotion = prompt(
+                `${Table[`${x},${y}`][1] == 'l' ? "White" : "Black"} has promoted their pawn!\n` +
+                `Please select a piece to promote to:\n` +
+                `(Quuen: q | Knight: n | Bishop: b | Rook: r)`, 'q');
+            if (!['q', 'n', 'b', 'r'].includes(promotion)) promotion = 'q';
+            Table[`${x},${y}`] = promotion + Table[`${x},${y}`][1];
+        }
         selectedPiece = "";
         moves = [];
         return;
@@ -320,7 +329,7 @@ function checkOutOfBounds(x, y) {
 }
 
 function checkSameColor(x1, y1, x2, y2) {
-    if (!Table[`${x},${y}`]) return true;
+    if (!Table[`${x1},${y1}`] || !Table[`${x2},${y2}`]) return true;
     if (checkAvailable(x1, y1) || checkAvailable(x2, y2)) return false;
     return Table[`${x1},${y1}`][1] == Table[`${x2},${y2}`][1];
 }
